@@ -1,1 +1,165 @@
 @import "tailwindcss";
+
+@theme {
+  --color-pine-950: #041a16;
+  --color-pine-900: #06231e;
+  --color-pine-850: #092f29;
+  --color-pine-800: #0c3b33;
+  --color-pine-700: #125147;
+  --color-pine-600: #1c6a5a;
+  --color-pine-500: #2c8271;
+  --color-pine-400: #4f8f80;
+  --color-pine-300: #8fbcae;
+  --color-pine-200: #c3d9d0;
+  --color-pine-100: #e2ede8;
+  --color-pine-50: #f0f6f3;
+
+  --color-gold-200: #f8e3b3;
+  --color-gold-300: #f3d189;
+  --color-gold-400: #eebc62;
+  --color-gold-500: #dfa63e;
+  --color-gold-600: #c48a2b;
+  --color-gold-700: #9c6c1f;
+
+  --color-paper: #f7f4ea;
+  --color-ink: #16352e;
+
+  --font-display: "Prata", "Times New Roman", serif;
+  --font-body: "Golos Text", "Segoe UI", Tahoma, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-pine-100);
+  background-color: var(--color-pine-950);
+  background-image:
+    radial-gradient(1100px 700px at 88% -12%, rgba(238, 188, 98, 0.09), transparent 62%),
+    radial-gradient(900px 680px at -12% 108%, rgba(28, 106, 90, 0.4), transparent 60%),
+    linear-gradient(158deg, #06231e 0%, #092f29 52%, #041a16 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-gold-400);
+  color: var(--color-pine-950);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(18, 81, 71, 0.9) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(18, 81, 71, 0.9);
+  border-radius: 8px;
+  border: 2px solid rgba(4, 26, 22, 0.6);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes toastin {
+  from {
+    opacity: 0;
+    transform: translateX(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+@keyframes pulsedot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(238, 188, 98, 0.55);
+  }
+  60% {
+    box-shadow: 0 0 0 7px rgba(238, 188, 98, 0);
+  }
+}
+@keyframes barflow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 28px 0;
+  }
+}
+
+.anim-rise {
+  animation: rise 0.45s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+.anim-fade {
+  animation: fadein 0.3s ease both;
+}
+.anim-toast {
+  animation: toastin 0.32s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+.anim-pulsedot {
+  animation: pulsedot 1.6s ease-out infinite;
+}
+.progress-stripes {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.18) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.18) 75%,
+    transparent 75%
+  );
+  background-size: 28px 28px;
+  animation: barflow 0.9s linear infinite;
+}
+
+.preview-dots {
+  background-image: radial-gradient(rgba(143, 188, 174, 0.14) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+}
+
+.report-page {
+  box-shadow: 0 26px 60px -18px rgba(0, 0, 0, 0.6);
+}
