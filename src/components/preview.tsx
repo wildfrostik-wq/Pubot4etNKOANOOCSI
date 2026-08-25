@@ -134,81 +134,100 @@ function CoverPage({ data, strip }: { data: ReportData; strip?: boolean }) {
       }}
     >
       <div className="pointer-events-none absolute inset-[18px] border border-gold-400/40" />
-      <div className="relative flex h-full flex-col px-16 py-14">
-        <div className="flex items-start justify-between">
+      <div className="relative flex h-full flex-col px-16 py-11">
+        <div className="flex items-center justify-between">
           {o.logo ? (
-            <img src={o.logo} alt="" className="h-12 max-w-[180px] object-contain" />
+            <img
+              src={o.logo}
+              alt=""
+              className="h-11 max-w-[170px] object-contain"
+            />
           ) : (
             <Monogram
               name={o.shortName || o.fullName || "НКО"}
               className="h-11 w-11 rounded-[3px] text-[17px]"
             />
           )}
-          <span className="pt-1 text-right text-[9.5px] font-semibold uppercase leading-relaxed tracking-[0.3em] text-pine-200/75">
-            Публичный
-            <br />
-            годовой отчёт
-          </span>
+          {o.website && (
+            <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-pine-200/80">
+              {o.website}
+            </span>
+          )}
         </div>
 
-        <div
-          className={`flex flex-1 flex-col justify-center ${
-            o.coverPhoto ? "pb-[240px]" : "pb-[110px]"
-          }`}
-        >
+        {/* Заголовок отчёта */}
+        <div className="mt-7">
           <div className="h-[3px] w-14 bg-gold-400" />
-          <h1 className="mt-6 font-display text-[56px] leading-[1.02] text-pine-50">
-            Годовой
-            <br />
-            отчёт
+          <p className="mt-3.5 text-[11.5px] font-bold uppercase tracking-[0.3em] text-gold-300">
+            Публичный годовой отчёт
+          </p>
+          <h1 className="mt-2 line-clamp-3 font-display text-[34px] leading-[1.15] text-pine-50">
+            {o.fullName || "Название вашей организации"}
           </h1>
-          <div className="mt-1 font-display text-[108px] leading-[1.02] text-gold-400">
-            {data.year}
-          </div>
+          {(o.address || o.city) && (
+            <p className="mt-2 line-clamp-2 max-w-[560px] text-[11.5px] leading-snug text-pine-200/85">
+              {o.address || o.city}
+            </p>
+          )}
+          <p className="mt-2.5 font-display text-[23px] leading-none text-gold-400">
+            за {data.year} год
+          </p>
           {o.mission && (
-            <p className="mt-7 max-w-[440px] border-l-2 border-gold-400/80 pl-4 text-[14.5px] leading-[1.6] text-pine-100/95">
+            <p className="mt-4 line-clamp-3 max-w-[560px] border-l-2 border-gold-400/70 pl-3.5 text-[13px] leading-[1.6] text-pine-100/90">
               {o.mission}
             </p>
           )}
         </div>
 
-        {o.coverPhoto ? (
-          <div className="absolute bottom-0 left-0 right-0 h-[250px]">
-            <PImg
-              src={o.coverPhoto}
-              strip={strip}
-              className="h-full w-full object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(4,26,22,0.92) 8%, rgba(4,26,22,0.35) 55%, rgba(4,26,22,0.05) 100%)",
-              }}
-            />
-            <div className="absolute bottom-0 left-0 right-0 px-16 pb-8">
-              <p className="text-[16.5px] font-semibold leading-snug text-pine-50">
-                {o.fullName || "Название вашей организации"}
-              </p>
-              <p className="mt-1.5 text-[10.5px] uppercase tracking-[0.22em] text-pine-200/85">
-                {[o.city, o.founded && `работаем с ${o.founded} года`]
-                  .filter(Boolean)
-                  .join(" · ")}
+        {/* Классическое фото 4:3 в двойной рамке */}
+        <div className="flex min-h-0 flex-1 items-center justify-center py-5">
+          {o.coverPhoto ? (
+            <div className="max-w-full border border-gold-400/60 bg-pine-950/50 p-[9px] shadow-[0_26px_60px_-22px_rgba(0,0,0,0.75)]">
+              <div className="border border-gold-400/25 p-[3px]">
+                <PImg
+                  src={o.coverPhoto}
+                  strip={strip}
+                  className="block aspect-[4/3] w-[452px] max-w-full object-cover"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex aspect-[4/3] w-[452px] max-w-full flex-col items-center justify-center gap-2 border border-dashed border-gold-400/45 bg-pine-950/35 text-pine-200/80">
+              <svg
+                width="30"
+                height="30"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="7" width="18" height="13" rx="2" />
+                <path d="M8.5 7 10 4h4l1.5 3" />
+                <circle cx="12" cy="13.5" r="3.5" />
+              </svg>
+              <p className="text-[12px] font-semibold">Фотография на обложку</p>
+              <p className="text-[9.5px] uppercase tracking-[0.18em] text-pine-300/70">
+                раздел «Организация» · формат 4:3
               </p>
             </div>
-          </div>
-        ) : (
-          <div className="absolute bottom-0 left-0 right-0 border-t border-gold-400/30 px-16 py-7">
-            <p className="text-[15.5px] font-semibold leading-snug text-pine-50">
-              {o.fullName || "Название вашей организации"}
-            </p>
-            <p className="mt-1.5 text-[10px] uppercase tracking-[0.22em] text-pine-200/75">
-              {[o.city, o.founded && `основана в ${o.founded} году`]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Подпись платформы */}
+        <div className="border-t border-gold-400/30 pt-3.5 text-center">
+          <p className="text-[8.5px] font-bold uppercase tracking-[0.24em] text-pine-300/85">
+            Отчёт подготовлен на платформе
+          </p>
+          <p className="mt-1 text-[11px] font-semibold leading-snug text-pine-100">
+            АНО «Общественный центр социальных инициатив» — ресурсный центр
+            поддержки НКО
+          </p>
+          <p className="mt-0.5 text-[10.5px] font-bold text-gold-300">
+            anoocsi.ru&ensp;·&ensp;anoocsi@yandex.ru
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -972,13 +991,29 @@ function ContactsPage({
           </div>
         </div>
 
-        <div className="mt-auto flex items-end justify-between">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-pine-200/60">
-            © {data.year} {o.shortName || o.fullName || "НКО"}
-          </p>
-          {o.website && (
-            <p className="font-display text-[22px] text-gold-300">{o.website}</p>
-          )}
+        <div className="mt-auto">
+          <div className="border-t border-gold-400/25 pt-4 text-center">
+            <p className="text-[8.5px] font-bold uppercase tracking-[0.24em] text-pine-300/85">
+              Отчёт подготовлен на платформе
+            </p>
+            <p className="mt-1 text-[11px] font-semibold leading-snug text-pine-100">
+              АНО «Общественный центр социальных инициатив» — ресурсный центр
+              поддержки НКО
+            </p>
+            <p className="mt-0.5 text-[10.5px] font-bold text-gold-300">
+              anoocsi.ru&ensp;·&ensp;anoocsi@yandex.ru
+            </p>
+          </div>
+          <div className="mt-3.5 flex items-end justify-between">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-pine-200/60">
+              © {data.year} {o.shortName || o.fullName || "НКО"}
+            </p>
+            {o.website && (
+              <p className="font-display text-[22px] text-gold-300">
+                {o.website}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

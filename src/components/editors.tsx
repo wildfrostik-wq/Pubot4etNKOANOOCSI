@@ -121,7 +121,7 @@ export function OrgEditor({
             onFail={onFail}
           />
         </Field>
-        <Field label="Фото на обложку" hint="нижний разворот обложки">
+        <Field label="Фото на обложку" hint="в центре обложки · формат 4:3">
           <ImageUpload
             value={o.coverPhoto}
             onChange={(coverPhoto) => patch({ coverPhoto })}

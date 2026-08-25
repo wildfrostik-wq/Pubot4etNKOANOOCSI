@@ -365,10 +365,21 @@ export default function App() {
             })}
           </nav>
           <div className="border-t border-pine-700/50 p-3.5">
-            <p className="text-[10.5px] leading-relaxed text-pine-400">
-              Структура — по стандарту публичной отчётности{" "}
-              <span className="text-pine-200">«Точка отсчёта»</span> (Форум
-              Доноров): миссия, команда, программы, прозрачные финансы.
+            <p className="text-[10.5px] font-bold leading-snug text-pine-200">
+              АНО «Общественный центр социальных инициатив»
+            </p>
+            <p className="mt-1 text-[10.5px] leading-relaxed text-pine-400">
+              Ресурсный центр поддержки НКО ·{" "}
+              <span className="text-gold-300">anoocsi.ru</span>
+            </p>
+            <p className="mt-1.5 text-[10.5px] leading-relaxed text-pine-400">
+              По вопросам работы с платформой пишите:{" "}
+              <a
+                href="mailto:anoocsi@yandex.ru"
+                className="font-semibold text-gold-300 underline decoration-gold-400/40 underline-offset-2 transition-colors hover:text-gold-200"
+              >
+                anoocsi@yandex.ru
+              </a>
             </p>
           </div>
         </aside>
