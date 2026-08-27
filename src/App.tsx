@@ -68,6 +68,7 @@ function loadData(): ReportData {
     return {
       ...base,
       ...p,
+      year: "2025", // отчёт всегда формируется за 2025 год
       org: { ...base.org, ...(p.org || {}) },
       director: { ...base.director, ...(p.director || {}) },
       team: Array.isArray(p.team) ? p.team : base.team,
@@ -305,24 +306,11 @@ export default function App() {
             </span>
           </div>
 
-          <label className="ml-auto flex items-center gap-1.5 lg:ml-0">
-            <span className="hidden text-[10px] font-bold uppercase tracking-[0.16em] text-pine-400 sm:inline">
-              Год
-            </span>
-            <select
-              value={data.year}
-              onChange={(e) => setData((d) => ({ ...d, year: e.target.value }))}
-              className="rounded-md border border-pine-700 bg-pine-900 px-2 py-1.5 text-[13px] font-bold text-gold-300 outline-none transition-colors hover:border-pine-600 focus:border-gold-400/70"
-            >
-              {["2022", "2023", "2024", "2025", "2026"].map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </label>
+          <span className="ml-auto hidden items-center gap-1.5 rounded-md border border-pine-700/80 bg-pine-900/70 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-pine-300 lg:ml-0 lg:flex">
+            отчёт за {data.year} год
+          </span>
 
-          <GhostButton onClick={requestSample}>
+          <GhostButton onClick={requestSample} className="ml-auto lg:ml-0">
             <Icon name="spark" size={15} />
             <span className="hidden sm:inline">Пример</span>
           </GhostButton>

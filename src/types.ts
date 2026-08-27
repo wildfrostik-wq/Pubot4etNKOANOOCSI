@@ -102,7 +102,7 @@ const s = () => Math.random().toString(36).slice(2, 10);
 
 export function emptyReport(): ReportData {
   return {
-    year: "2025",
+    year: "2025", // отчёт формируется за 2025 год
     org: {
       fullName: "",
       shortName: "",

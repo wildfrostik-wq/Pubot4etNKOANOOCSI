@@ -165,11 +165,9 @@ function CoverPage({
         {/* Заголовок отчёта */}
         <div className="mt-6">
           <div className="h-[3px] w-14 bg-(--rp-accent)" />
-          <h1 className="mt-3.5 font-display leading-[1.06] text-(--rp-on-dark)">
+          <h1 className="mt-3.5 font-display leading-[1.06] text-(--rp-accent)">
             <span className="block text-[38px]">Публичный годовой отчёт</span>
-            <span className="block text-[46px] text-(--rp-accent)">
-              за {data.year} год
-            </span>
+            <span className="block text-[46px]">за {data.year} год</span>
           </h1>
           <p className="mt-3 line-clamp-2 font-display text-[19px] leading-[1.3] text-(--rp-on-dark)/95">
             {o.fullName || "Название вашей организации"}
@@ -933,6 +931,15 @@ function ContactsPage({
     Boolean
   );
 
+  /* Реальная дата заполнения отчёта — день, когда его формирует пользователь */
+  const now = new Date();
+  const fillYear = now.getFullYear();
+  const filledAt = new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(now);
+
   return (
     <div
       className="relative h-full w-full text-(--rp-on-dark)"
@@ -1031,7 +1038,8 @@ function ContactsPage({
           </div>
           <div className="mt-3.5 flex items-end justify-between">
             <p className="text-[10px] uppercase tracking-[0.18em] text-(--rp-on-dark)/60">
-              © {data.year} {o.shortName || o.fullName || "НКО"}
+              © {fillYear} {o.shortName || o.fullName || "НКО"} · заполнен{" "}
+              {filledAt}
             </p>
             {o.website && (
               <p className="font-display text-[22px] text-(--rp-accent)">
