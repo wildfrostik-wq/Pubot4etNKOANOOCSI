@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReportData, SectionId } from "./types";
 import { emptyReport } from "./types";
 import { sampleReport } from "./sample";
 import { hasContent, uid, wait } from "./utils";
+import { DEFAULT_THEME_ID, getTheme, THEMES } from "./themes";
 import { countPages, ReportPreview, PAGE_W, PAGE_H } from "./components/preview";
 import { exportReportPdf } from "./pdf";
 import {
@@ -25,6 +26,7 @@ import {
 } from "./components/ui";
 
 const LS_KEY = "nko-annual-report-v1";
+const THEME_KEY = "nko-report-theme-v1";
 const PAGE_GAP = 40;
 
 const SECTIONS: { id: SectionId; n: string; title: string; icon: string }[] = [
@@ -78,8 +80,17 @@ function loadData(): ReportData {
   }
 }
 
+function loadTheme(): string {
+  try {
+    return localStorage.getItem(THEME_KEY) || DEFAULT_THEME_ID;
+  } catch {
+    return DEFAULT_THEME_ID;
+  }
+}
+
 export default function App() {
   const [data, setData] = useState<ReportData>(loadData);
+  const [themeId, setThemeId] = useState<string>(loadTheme);
   const [active, setActive] = useState<SectionId>("org");
   const [zoom, setZoom] = useState(0.42);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -89,6 +100,7 @@ export default function App() {
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
+  const theme = getTheme(themeId);
   const previewRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const firstRun = useRef(true);
@@ -121,6 +133,27 @@ export default function App() {
     }, 400);
     return () => window.clearTimeout(t);
   }, [data, notify]);
+
+  /* Сохранение выбранного стиля */
+  useEffect(() => {
+    try {
+      localStorage.setItem(THEME_KEY, themeId);
+    } catch {
+      /* не критично */
+    }
+  }, [themeId]);
+
+  /* На мобильных подбираем масштаб под ширину экрана */
+  useEffect(() => {
+    const fit = () => {
+      if (window.innerWidth < 1024) {
+        setZoom(Math.max(0.2, Math.min(0.42, (window.innerWidth - 34) / PAGE_W)));
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
 
   const pagesTotal = useMemo(() => countPages(data), [data]);
   const canExport = Boolean(
@@ -214,25 +247,25 @@ export default function App() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* ------------------------------- Верхняя панель ------------------------------- */}
-      <header className="flex h-[58px] shrink-0 items-center gap-3 border-b border-pine-700/60 bg-pine-950/60 px-4 backdrop-blur-md">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gold-400 text-pine-950 shadow-[0_2px_12px_-2px_rgba(238,188,98,0.5)]">
+      <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-pine-700/60 bg-pine-950/60 px-3 py-2.5 backdrop-blur-md sm:px-4 lg:h-[58px] lg:flex-nowrap lg:py-0">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gold-400 text-pine-950 shadow-[0_2px_12px_-2px_rgba(238,188,98,0.5)]">
             <Icon name="doc" size={19} strokeWidth={2} />
           </span>
-          <div>
-            <p className="font-display text-[16px] leading-none text-pine-50">
+          <div className="min-w-0">
+            <p className="truncate font-display text-[15px] leading-none text-pine-50 sm:text-[16px]">
               Годовой отчёт НКО
             </p>
-            <p className="mt-1 text-[9.5px] font-semibold uppercase tracking-[0.22em] text-pine-300">
+            <p className="mt-1 hidden text-[9.5px] font-semibold uppercase tracking-[0.22em] text-pine-300 sm:block">
               конструктор публичной отчётности
             </p>
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-2.5">
+        <div className="order-3 flex w-full items-center gap-2 border-t border-pine-800/70 pt-2 lg:order-none lg:ml-auto lg:w-auto lg:border-0 lg:pt-0">
           <div
             key={savedAt ?? 0}
-            className="mr-1 hidden items-center gap-2 md:flex"
+            className="mr-0.5 hidden items-center gap-2 xl:flex"
             title="Черновик автоматически сохраняется в браузере"
           >
             <span
@@ -241,13 +274,13 @@ export default function App() {
                 savedAt ? "anim-pulsedot bg-gold-400" : "bg-pine-600"
               )}
             />
-            <span className="text-[11px] text-pine-300">
+            <span className="whitespace-nowrap text-[11px] text-pine-300">
               {savedAt ? "Черновик сохранён" : "Новый отчёт"}
             </span>
           </div>
 
-          <label className="hidden items-center gap-1.5 sm:flex">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-pine-400">
+          <label className="ml-auto flex items-center gap-1.5 lg:ml-0">
+            <span className="hidden text-[10px] font-bold uppercase tracking-[0.16em] text-pine-400 sm:inline">
               Год
             </span>
             <select
@@ -263,8 +296,9 @@ export default function App() {
             </select>
           </label>
 
-          <GhostButton onClick={requestSample} className="hidden sm:inline-flex">
-            <Icon name="spark" size={15} /> Пример
+          <GhostButton onClick={requestSample}>
+            <Icon name="spark" size={15} />
+            <span className="hidden sm:inline">Пример</span>
           </GhostButton>
           <GhostButton
             onClick={requestClear}
@@ -275,9 +309,13 @@ export default function App() {
           </GhostButton>
           <GoldButton onClick={handleExport} disabled={Boolean(exporting)}>
             <Icon name="download" size={16} strokeWidth={2.1} />
-            {exporting
-              ? `Экспорт ${exporting.page}/${exporting.total}`
-              : "Скачать PDF"}
+            {exporting ? (
+              `${exporting.page}/${exporting.total}`
+            ) : (
+              <>
+                <span className="hidden sm:inline">Скачать </span>PDF
+              </>
+            )}
           </GoldButton>
         </div>
       </header>
@@ -311,13 +349,8 @@ export default function App() {
       </div>
 
       <div className="flex min-h-0 flex-1">
-        {/* ------------------------------- Навигация ------------------------------- */}
-        <aside
-          className={cx(
-            "w-[222px] shrink-0 flex-col border-r border-pine-700/50 bg-pine-900/40",
-            mobileView === "preview" ? "hidden lg:flex" : "flex"
-          )}
-        >
+        {/* ------------------------------- Навигация (desktop) ------------------------------- */}
+        <aside className="hidden w-[222px] shrink-0 flex-col border-r border-pine-700/50 bg-pine-900/40 lg:flex">
           <nav className="flex-1 overflow-y-auto p-3">
             <p className="px-2.5 pb-2 pt-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-pine-400">
               Разделы отчёта
@@ -328,10 +361,7 @@ export default function App() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => {
-                    setActive(s.id);
-                    setMobileView("editor");
-                  }}
+                  onClick={() => setActive(s.id)}
                   className={cx(
                     "group relative mb-1 flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-left transition-all duration-150",
                     isActive
@@ -398,7 +428,84 @@ export default function App() {
             mobileView === "preview" && "hidden lg:block"
           )}
         >
-          <div className="mx-auto max-w-[780px] px-5 py-7 lg:px-9">
+          {/* Стиль отчёта */}
+          <div className="sticky top-0 z-20 border-b border-pine-800/70 bg-pine-950/80 px-4 py-2.5 backdrop-blur-md sm:px-6">
+            <div className="mx-auto flex max-w-[780px] items-center gap-3">
+              <span className="hidden shrink-0 text-[10px] font-bold uppercase tracking-[0.18em] text-pine-400 sm:inline">
+                Стиль отчёта
+              </span>
+              <div className="no-scrollbar flex flex-1 gap-2 overflow-x-auto py-0.5">
+                {THEMES.map((t) => {
+                  const isActive = t.id === themeId;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        if (t.id !== themeId) {
+                          setThemeId(t.id);
+                          notify("info", `Стиль отчёта: «${t.name}»`);
+                        }
+                      }}
+                      title={t.tagline}
+                      className={cx(
+                        "flex shrink-0 items-center gap-2 rounded-md border px-2.5 py-1.5 transition-all duration-150 active:translate-y-px",
+                        isActive
+                          ? "border-gold-400/80 bg-gold-400/10 text-pine-50 ring-1 ring-gold-400/40"
+                          : "border-pine-700 bg-pine-900/60 text-pine-300 hover:border-pine-500 hover:text-pine-100"
+                      )}
+                    >
+                      <span className="flex -space-x-1">
+                        <span
+                          className="h-3.5 w-3.5 rounded-full border border-white/25"
+                          style={{ background: t.dark2 }}
+                        />
+                        <span
+                          className="h-3.5 w-3.5 rounded-full border border-white/25"
+                          style={{ background: t.accent }}
+                        />
+                      </span>
+                      <span className="whitespace-nowrap text-[12px] font-bold">
+                        {t.name}
+                      </span>
+                      {isActive && (
+                        <Icon name="check" size={11} strokeWidth={2.6} className="text-gold-300" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Мобильная навигация по разделам */}
+          <div className="no-scrollbar flex gap-1.5 overflow-x-auto border-b border-pine-800/60 bg-pine-900/30 px-3 py-2 lg:hidden">
+            {SECTIONS.map((s) => {
+              const done = isSectionComplete(data, s.id);
+              const isActive = active === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setActive(s.id)}
+                  className={cx(
+                    "flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-bold transition-colors",
+                    isActive
+                      ? "border-gold-400/70 bg-gold-400/10 text-gold-300"
+                      : "border-pine-700 bg-pine-900/60 text-pine-300"
+                  )}
+                >
+                  <span className={cx("font-display", isActive ? "text-gold-300" : "text-pine-500")}>
+                    {s.n}
+                  </span>
+                  {s.title}
+                  {done && (
+                    <Icon name="check" size={10} strokeWidth={2.6} className="text-gold-300" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mx-auto max-w-[780px] px-4 py-6 sm:px-6 lg:px-9 lg:py-7">
             {active === "org" && (
               <OrgEditor data={data} setData={setData} onFail={onFail} />
             )}
@@ -428,15 +535,18 @@ export default function App() {
             mobileView === "editor" && !exporting && "hidden lg:block"
           )}
         >
-          <div className="pointer-events-none sticky top-0 z-10 flex items-center justify-between px-5 py-3">
+          <div className="pointer-events-none sticky top-0 z-10 flex items-center justify-between px-4 py-3 sm:px-5">
             <span className="pointer-events-auto flex items-center gap-2 rounded-md border border-pine-700/70 bg-pine-950/85 px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-pine-300 backdrop-blur">
               <Icon name="eye" size={13} />
               Предпросмотр · {pagesTotal} стр. A4
             </span>
           </div>
 
-          <div className="flex flex-col items-center px-6 pb-16 pt-2">
-            <div className="relative" style={{ width: PAGE_W * z, height: innerH * z }}>
+          <div className="flex flex-col items-center px-3 pb-20 pt-2 sm:px-6 sm:pb-16">
+            <div
+              className="relative"
+              style={{ width: PAGE_W * z, height: innerH * z }}
+            >
               <div
                 ref={previewRef}
                 className="absolute left-0 top-0 flex flex-col"
@@ -446,7 +556,7 @@ export default function App() {
                   transformOrigin: "top left",
                 }}
               >
-                <ReportPreview data={data} strip={stripRemote} />
+                <ReportPreview data={data} theme={theme} strip={stripRemote} />
               </div>
             </div>
           </div>
@@ -454,7 +564,7 @@ export default function App() {
           {/* Масштаб */}
           <div
             className={cx(
-              "fixed bottom-5 right-5 z-20 items-center gap-1 rounded-lg border border-pine-700 bg-pine-950/90 p-1.5 shadow-xl backdrop-blur",
+              "fixed bottom-4 right-4 z-20 items-center gap-1 rounded-lg border border-pine-700 bg-pine-950/90 p-1.5 shadow-xl backdrop-blur sm:bottom-5 sm:right-5",
               mobileView === "editor" && !exporting ? "hidden lg:flex" : "flex"
             )}
           >
@@ -477,11 +587,17 @@ export default function App() {
             </button>
             <span className="mx-0.5 h-4 w-px bg-pine-700" />
             <button
-              onClick={() => setZoom(0.42)}
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  setZoom(Math.max(0.2, Math.min(0.42, (window.innerWidth - 34) / PAGE_W)));
+                } else {
+                  setZoom(0.42);
+                }
+              }}
               className="rounded-md px-2 py-1.5 text-[11px] font-bold text-pine-300 transition-colors hover:bg-pine-800 hover:text-gold-300"
-              title="Масштаб по умолчанию"
+              title="Вписать в экран"
             >
-              42%
+              Вписать
             </button>
           </div>
         </section>
@@ -553,7 +669,10 @@ export default function App() {
         Отчёт вернётся к пустому шаблону.
       </Modal>
 
-      <ToastHost toasts={toasts} onDismiss={(id) => setToasts((t) => t.filter((x) => x.id !== id))} />
+      <ToastHost
+        toasts={toasts}
+        onDismiss={(id) => setToasts((t) => t.filter((x) => x.id !== id))}
+      />
     </div>
   );
 }
