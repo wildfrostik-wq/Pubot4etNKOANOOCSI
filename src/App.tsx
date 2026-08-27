@@ -370,7 +370,14 @@ export default function App() {
             </p>
             <p className="mt-1 text-[10.5px] leading-relaxed text-pine-400">
               Ресурсный центр поддержки НКО ·{" "}
-              <span className="text-gold-300">anoocsi.ru</span>
+              <a
+                href="https://anoocsi.ru"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-gold-300 underline decoration-gold-400/40 underline-offset-2 transition-colors hover:text-gold-200"
+              >
+                anoocsi.ru
+              </a>
             </p>
             <p className="mt-1.5 text-[10.5px] leading-relaxed text-pine-400">
               По вопросам работы с платформой пишите:{" "}

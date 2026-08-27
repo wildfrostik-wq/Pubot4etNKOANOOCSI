@@ -1000,8 +1000,22 @@ function ContactsPage({
               АНО «Общественный центр социальных инициатив» — ресурсный центр
               поддержки НКО
             </p>
-            <p className="mt-0.5 text-[10.5px] font-bold text-gold-300">
-              anoocsi.ru&ensp;·&ensp;anoocsi@yandex.ru
+            <p className="mt-0.5 text-[10.5px] font-bold">
+              <a
+                href="https://anoocsi.ru"
+                target="_blank"
+                rel="noreferrer"
+                className="text-gold-300 underline decoration-gold-400/40 underline-offset-2"
+              >
+                anoocsi.ru
+              </a>
+              &ensp;·&ensp;
+              <a
+                href="mailto:anoocsi@yandex.ru"
+                className="text-gold-300 underline decoration-gold-400/40 underline-offset-2"
+              >
+                anoocsi@yandex.ru
+              </a>
             </p>
           </div>
           <div className="mt-3.5 flex items-end justify-between">
