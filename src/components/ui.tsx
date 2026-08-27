@@ -128,6 +128,18 @@ const paths: Record<string, React.ReactNode> = {
     </>
   ),
   chevron: <path d="m6 9 6 6 6-6" />,
+  arrowRight: (
+    <>
+      <path d="M4 12h15" />
+      <path d="m13 6 6 6-6 6" />
+    </>
+  ),
+  arrowLeft: (
+    <>
+      <path d="M20 12H5" />
+      <path d="m11 6-6 6 6 6" />
+    </>
+  ),
 };
 
 export function Icon({

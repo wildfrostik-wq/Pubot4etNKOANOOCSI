@@ -103,6 +103,7 @@ export default function App() {
   const theme = getTheme(themeId);
   const previewRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const editorScrollRef = useRef<HTMLElement>(null);
   const firstRun = useRef(true);
 
   const notify = useCallback((kind: ToastKind, msg: string) => {
@@ -244,6 +245,31 @@ export default function App() {
 
   const onFail = (m: string) => notify("error", m);
 
+  /* --------------------------- Навигация по разделам --------------------------- */
+  const secIdx = Math.max(0, SECTIONS.findIndex((s) => s.id === active));
+  const prevSection = secIdx > 0 ? SECTIONS[secIdx - 1] : null;
+  const nextSection =
+    secIdx < SECTIONS.length - 1 ? SECTIONS[secIdx + 1] : null;
+
+  const selectSection = (id: SectionId) => {
+    setActive(id);
+    setMobileView("editor");
+    requestAnimationFrame(() =>
+      editorScrollRef.current?.scrollTo({ top: 0 })
+    );
+  };
+
+  const goNext = () => {
+    if (nextSection) selectSection(nextSection.id);
+  };
+  const goPrev = () => {
+    if (prevSection) selectSection(prevSection.id);
+  };
+  const toPreview = () => {
+    setMobileView("preview");
+    scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* ------------------------------- Верхняя панель ------------------------------- */}
@@ -361,7 +387,7 @@ export default function App() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => setActive(s.id)}
+                  onClick={() => selectSection(s.id)}
                   className={cx(
                     "group relative mb-1 flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-left transition-all duration-150",
                     isActive
@@ -423,6 +449,7 @@ export default function App() {
 
         {/* ------------------------------- Редактор ------------------------------- */}
         <section
+          ref={editorScrollRef}
           className={cx(
             "min-w-0 flex-1 overflow-y-auto",
             mobileView === "preview" && "hidden lg:block"
@@ -485,7 +512,7 @@ export default function App() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => setActive(s.id)}
+                  onClick={() => selectSection(s.id)}
                   className={cx(
                     "flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-bold transition-colors",
                     isActive
@@ -506,24 +533,85 @@ export default function App() {
           </div>
 
           <div className="mx-auto max-w-[780px] px-4 py-6 sm:px-6 lg:px-9 lg:py-7">
-            {active === "org" && (
-              <OrgEditor data={data} setData={setData} onFail={onFail} />
-            )}
-            {active === "director" && (
-              <DirectorEditor data={data} setData={setData} onFail={onFail} />
-            )}
-            {active === "team" && (
-              <TeamEditor data={data} setData={setData} onFail={onFail} />
-            )}
-            {active === "programs" && (
-              <ProgramsEditor data={data} setData={setData} onFail={onFail} />
-            )}
-            {active === "finance" && (
-              <FinanceEditor data={data} setData={setData} />
-            )}
-            {active === "partners" && (
-              <PartnersEditor data={data} setData={setData} onFail={onFail} />
-            )}
+            <div key={active} className="anim-rise">
+              {active === "org" && (
+                <OrgEditor data={data} setData={setData} onFail={onFail} />
+              )}
+              {active === "director" && (
+                <DirectorEditor data={data} setData={setData} onFail={onFail} />
+              )}
+              {active === "team" && (
+                <TeamEditor data={data} setData={setData} onFail={onFail} />
+              )}
+              {active === "programs" && (
+                <ProgramsEditor data={data} setData={setData} onFail={onFail} />
+              )}
+              {active === "finance" && (
+                <FinanceEditor data={data} setData={setData} />
+              )}
+              {active === "partners" && (
+                <PartnersEditor data={data} setData={setData} onFail={onFail} />
+              )}
+            </div>
+
+            {/* -------- Навигация: назад / прогресс / далее -------- */}
+            <div className="mt-9 flex flex-wrap items-center justify-between gap-3 border-t border-pine-800/70 pt-5 sm:flex-nowrap">
+              {prevSection ? (
+                <GhostButton
+                  onClick={goPrev}
+                  className="order-2 w-full sm:order-none sm:w-auto"
+                >
+                  <Icon name="arrowLeft" size={15} />
+                  <span className="truncate">
+                    <span className="hidden sm:inline">Назад — </span>
+                    {prevSection.title}
+                  </span>
+                </GhostButton>
+              ) : (
+                <span className="order-2 sm:order-none" />
+              )}
+
+              <div className="order-1 flex w-full items-center justify-center gap-2 sm:order-none sm:w-auto sm:flex-1">
+                {SECTIONS.map((s, i) => (
+                  <button
+                    key={s.id}
+                    onClick={() => selectSection(s.id)}
+                    title={s.title}
+                    className={cx(
+                      "h-[5px] rounded-full transition-all duration-300",
+                      i === secIdx
+                        ? "w-6 bg-gold-400"
+                        : i < secIdx
+                          ? "w-[14px] bg-pine-600 hover:bg-pine-500"
+                          : "w-[14px] bg-pine-800 hover:bg-pine-700"
+                    )}
+                  />
+                ))}
+                <span className="ml-2 font-display text-[12px] text-pine-400">
+                  {secIdx + 1}/{SECTIONS.length}
+                </span>
+              </div>
+
+              {nextSection ? (
+                <GoldButton
+                  onClick={goNext}
+                  className="order-3 w-full sm:order-none sm:w-auto"
+                >
+                  <span className="truncate">
+                    Далее — {nextSection.title}
+                  </span>
+                  <Icon name="arrowRight" size={16} strokeWidth={2.1} />
+                </GoldButton>
+              ) : (
+                <GoldButton
+                  onClick={toPreview}
+                  className="order-3 w-full sm:order-none sm:w-auto"
+                >
+                  <Icon name="eye" size={16} strokeWidth={2} />
+                  К предпросмотру отчёта
+                </GoldButton>
+              )}
+            </div>
           </div>
         </section>
 
