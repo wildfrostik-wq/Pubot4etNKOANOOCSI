@@ -163,22 +163,22 @@ function CoverPage({
         </div>
 
         {/* Заголовок отчёта */}
-        <div className="mt-7">
+        <div className="mt-6">
           <div className="h-[3px] w-14 bg-(--rp-accent)" />
-          <p className="mt-3.5 text-[11.5px] font-bold uppercase tracking-[0.3em] text-(--rp-accent)">
-            Публичный годовой отчёт
-          </p>
-          <h1 className="mt-2 line-clamp-3 font-display text-[34px] leading-[1.15] text-(--rp-on-dark)">
-            {o.fullName || "Название вашей организации"}
+          <h1 className="mt-3.5 font-display leading-[1.06] text-(--rp-on-dark)">
+            <span className="block text-[38px]">Публичный годовой отчёт</span>
+            <span className="block text-[46px] text-(--rp-accent)">
+              за {data.year} год
+            </span>
           </h1>
+          <p className="mt-3 line-clamp-2 font-display text-[19px] leading-[1.3] text-(--rp-on-dark)/95">
+            {o.fullName || "Название вашей организации"}
+          </p>
           {(o.address || o.city) && (
-            <p className="mt-2 line-clamp-2 max-w-[560px] text-[11.5px] leading-snug text-(--rp-on-dark)/85">
+            <p className="mt-1.5 line-clamp-2 max-w-[560px] text-[11px] leading-snug text-(--rp-on-dark)/80">
               {o.address || o.city}
             </p>
           )}
-          <p className="mt-2.5 font-display text-[23px] leading-none text-(--rp-accent)">
-            за {data.year} год
-          </p>
           {o.mission && (
             <p className="mt-4 line-clamp-3 max-w-[560px] border-l-2 border-(--rp-accent)/70 pl-3.5 text-[13px] leading-[1.6] text-(--rp-on-dark)/90">
               {o.mission}
